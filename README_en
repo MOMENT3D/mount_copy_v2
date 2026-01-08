@@ -1,7 +1,7 @@
 When you insert USB memory into the 3D printer, it overwrites or deletes the g code of the file with the same name.
 
 Function
-=========
+######
 
 1. Copy - Insert a USB flash containing one file or multiple "gcode" files
    Copies to the print folder
@@ -14,44 +14,42 @@ Function
    # For raspberry pie
    #DESTINATION="/home/pi/printer_data/gcodes"
    
-   # When using the BIQU CB 1 module
+   # When using the BIQU CB1 module
    대상="/home/biqu/printer_data/gcodes"
 
-
 Installation
-=========
-# 1. Route movement
-cd /home/biqu/mount_copy/
+######
 
-# 2. Install and Authorize Executives Scripts
-sudo cp mountcopy /usr/bin/
-sudo chmod +x /usr/bin/mountcopy
+Connect to SSH terminal, will remove existing algorithms and install new ones.
+If you don't have an existing algorithm, you can exclude up to step 5.
 
-# 3. Installing udev Rules
-sudo cp 99-mountcopy.rules /etc/udev/rules.d/
+1. Remove previously used Udev rules.
+   sudo rm /etc/udev/rules.d/99-mountcopy.rules
 
-# 4. Systemd service file installation
-sudo cp mountcopy@.service /etc/systemd/system/
+2. Delete the helper script.
+   sudo rm /usr/bin/mountcopy
 
-# 5. Reflect and restart system settings
-sudo systemctl daemon-reload
-sudo udevadm control --reload-rules
-sudo udevadm trigger
+3. Enter when a password request is received
+   
+4. Load the UDEV configuration.
+   sudo udevadm control --reload-rules && sudo udevadm trigger
+
+5. Remove the previous algorithm.
+   <Enter the 3 lines below at once> 
+   sudo rm -rf /home/biqu/mount_copy
+   mkdir -p /home/biqu/mount_copy
+  cd /home/biqu/mount_copy
+
+6. Install a new algorithm.
+   cd
+   git clone https://github.com/MOMENT3D/mount_copy_v2.git
+   cd /home/biqu/mount_copy_v2
+   chmod +x *.sh
+   ./install.sh
 
 Removal
-=========
-# 1. Aborting and disabling enabled Systemd services
-sudo systemctl stop mountcopy@*.service 2>/dev/null
-sudo systemctl disable mountcopy@.service 2>/dev/null
-
-# 2. Delete installed files
-sudo rm /usr/bin/mountcopy
-sudo rm /etc/udev/rules.d/99-mountcopy.rules
-sudo rm /etc/systemd/system/mountcopy@.service
-
-# 3. Delete temporary log files (optional)
-sudo rm /tmp/mountcopy.log 2>/dev/null
-
-# 4. Reflect and initialize system settings
-sudo systemctl daemon-reload
-sudo udevadm control --reload-rules
+######
+   cd
+   cd /home/biqu/mount_copy_v2
+   chmod +x *.sh
+   ./uninstall.sh
