@@ -1,7 +1,7 @@
 USB메모리를 3D프린터에 삽입하면 동일한 이름의 파일의 g코드를 덮어쓰거나 삭제합니다.
 
 기능
-=========
+######
 
 1. 복사 - 하나의 파일 또는 여러 "gcode" 파일이 포함된 USB 플래시를 삽입한 후
    인쇄 폴더에 복사됩니다
@@ -14,44 +14,42 @@ USB메모리를 3D프린터에 삽입하면 동일한 이름의 파일의 g코�
    # 라즈베리파이용
    #DESTINATION="/home/pi/printer_data/gcodes"
    
-   # BIQU CB 1 모듈 사용의 경우
+   # BIQU CB1 모듈 사용의 경우
    대상="/home/biqu/printer_data/gcodes"
 
-
 설치
-=========
-# 1. 경로 이동
-cd /home/biqu/mount_copy/
+######
 
-# 2. 실행 스크립트 설치 및 권한 부여
-sudo cp mountcopy /usr/bin/
-sudo chmod +x /usr/bin/mountcopy
+SSH 터미널에 접속합니다. 기존 알고리즘을 제거하고 신규 알고리즘을 설치할 것 입니다.
+기존 알고리즘이 없다면 순서5번까지 제외할 수 있습니다.
 
-# 3. udev 규칙 설치
-sudo cp 99-mountcopy.rules /etc/udev/rules.d/
+1. 이전에 사용되었던 Udev 규칙을 제거합니다.
+   sudo rm /etc/udev/rules.d/99-mountcopy.rules
 
-# 4. Systemd 서비스 파일 설치
-sudo cp mountcopy@.service /etc/systemd/system/
+2. 도우미 스크립트를 삭제합니다.
+   sudo rm /usr/bin/mountcopy
 
-# 5. 시스템 설정 반영 및 재시작
-sudo systemctl daemon-reload
-sudo udevadm control --reload-rules
-sudo udevadm trigger
+3. 패스워드 요청이 나오면 입력
+   
+4. UDEV 구성을 로드합니다.
+   sudo udevadm control --reload-rules && sudo udevadm trigger
+
+5. 이전 알고리즘을 제거합니다.
+   <아래 3줄 한번에 입력> 
+   sudo rm -rf /home/biqu/mount_copy
+   mkdir -p /home/biqu/mount_copy
+  cd /home/biqu/mount_copy
+
+6. 신규 알고리즘을 설치합니다.
+   cd
+   git clone https://github.com/MOMENT3D/mount_copy_v2.git
+   cd /home/biqu/mount_copy_v2
+   chmod +x *.sh
+   ./install.sh
 
 제거
-=========
-# 1. 활성화된 Systemd 서비스 중단 및 비활성화
-sudo systemctl stop mountcopy@*.service 2>/dev/null
-sudo systemctl disable mountcopy@.service 2>/dev/null
-
-# 2. 설치된 파일 삭제
-sudo rm /usr/bin/mountcopy
-sudo rm /etc/udev/rules.d/99-mountcopy.rules
-sudo rm /etc/systemd/system/mountcopy@.service
-
-# 3. 임시 로그 파일 삭제 (선택 사항)
-sudo rm /tmp/mountcopy.log 2>/dev/null
-
-# 4. 시스템 설정 반영 및 초기화
-sudo systemctl daemon-reload
-sudo udevadm control --reload-rules
+######
+   cd
+   cd /home/biqu/mount_copy_v2
+   chmod +x *.sh
+   ./uninstall.sh
