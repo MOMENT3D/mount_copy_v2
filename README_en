@@ -1,0 +1,57 @@
+When you insert USB memory into the 3D printer, it overwrites or deletes the g code of the file with the same name.
+
+Function
+=========
+
+1. Copy - Insert a USB flash containing one file or multiple "gcode" files
+   Copies to the print folder
+   
+2. Move - Insert an empty USB flash and all files will be moved.
+   "gcode" for folder to print
+   
+   The folder you want to print is set in the "mountcopy" file.
+   
+   # For raspberry pie
+   #DESTINATION="/home/pi/printer_data/gcodes"
+   
+   # When using the BIQU CB 1 module
+   대상="/home/biqu/printer_data/gcodes"
+
+
+Installation
+=========
+# 1. Route movement
+cd /home/biqu/mount_copy/
+
+# 2. Install and Authorize Executives Scripts
+sudo cp mountcopy /usr/bin/
+sudo chmod +x /usr/bin/mountcopy
+
+# 3. Installing udev Rules
+sudo cp 99-mountcopy.rules /etc/udev/rules.d/
+
+# 4. Systemd service file installation
+sudo cp mountcopy@.service /etc/systemd/system/
+
+# 5. Reflect and restart system settings
+sudo systemctl daemon-reload
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+Removal
+=========
+# 1. Aborting and disabling enabled Systemd services
+sudo systemctl stop mountcopy@*.service 2>/dev/null
+sudo systemctl disable mountcopy@.service 2>/dev/null
+
+# 2. Delete installed files
+sudo rm /usr/bin/mountcopy
+sudo rm /etc/udev/rules.d/99-mountcopy.rules
+sudo rm /etc/systemd/system/mountcopy@.service
+
+# 3. Delete temporary log files (optional)
+sudo rm /tmp/mountcopy.log 2>/dev/null
+
+# 4. Reflect and initialize system settings
+sudo systemctl daemon-reload
+sudo udevadm control --reload-rules

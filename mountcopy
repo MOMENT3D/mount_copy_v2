@@ -1,0 +1,25 @@
+#!/bin/sh
+export PATH=/bin:/usr/bin
+PATTERN="*.gcode"
+DESTINATION="/home/biqu/printer_data/gcodes"
+device="$1"
+exec >> /tmp/mountcopy.log 2>&1
+echo "--- USB Event: $device at $(date) ---"
+if [ -z "$device" ]; then
+    echo "Error: No device"
+    exit 1
+fi
+mnt=$(mktemp -d)
+mount -o iocharset=utf8,umask=000 "/dev/$device" "$mnt" || \
+mount -o utf8,umask=000 "/dev/$device" "$mnt" || \
+mount "/dev/$device" "$mnt" || { echo "Mount failed"; rmdir "$mnt"; exit 106; }
+if ls "$mnt"/$PATTERN >/dev/null 2>&1; then
+    echo "Importing..."
+    cp "$mnt"/$PATTERN "$DESTINATION/" || exit 102
+else
+    echo "Exporting..."
+    mv "$DESTINATION"/$PATTERN "$mnt/" 2>/dev/null || echo "No files"
+fi
+sync
+umount "$mnt"
+rmdir "$mnt"

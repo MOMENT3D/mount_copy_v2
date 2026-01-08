@@ -1,0 +1,12 @@
+[Unit]
+Description=USB Mount Copy Service for %i
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mountcopy %i
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
